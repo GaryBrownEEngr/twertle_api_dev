@@ -10,31 +10,33 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func returnAllArticles(articles *[]models.Article) http.HandlerFunc {
+func returnAllArticles(articles models.ArticleStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
 		fmt.Println("Endpoint Hit: returnAllArticles")
-		json.NewEncoder(w).Encode(articles)
+		json.NewEncoder(w).Encode(articles.GetArticles())
 	}
 }
 
-func returnSingleArticles(articles []models.Article) http.HandlerFunc {
+func returnSingleArticles(articles models.ArticleStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
 		vars := mux.Vars(r)
 		key := vars["id"]
 
-		for _, article := range articles {
-			if article.Id == key {
-				json.NewEncoder(w).Encode(article)
-			}
+		a := articles.GetArticle(key)
+		if a == nil {
+			json.NewEncoder(w).Encode(apiError{"article not found"})
+			return
 		}
+
+		json.NewEncoder(w).Encode(a)
 	}
 }
 
-func createNewArticle(articles *[]models.Article) http.HandlerFunc {
+func createNewArticle(articles models.ArticleStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
@@ -43,8 +45,7 @@ func createNewArticle(articles *[]models.Article) http.HandlerFunc {
 
 		var newArticle models.Article
 		json.Unmarshal(reqBody, &newArticle)
-		newArticles := append(*articles, newArticle)
-		*articles = newArticles
+		articles.CreateArticle(&newArticle)
 		json.NewEncoder(w).Encode(newArticle)
 	}
 }

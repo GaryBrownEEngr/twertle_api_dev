@@ -6,3 +6,9 @@ type Article struct {
 	Desc    string `json:"desc"`
 	Content string `json:"content"`
 }
+
+type ArticleStore interface {
+	CreateArticle(newArticle *Article)
+	GetArticle(id string) *Article
+	GetArticles() []Article
+}

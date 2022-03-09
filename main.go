@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"main/api"
+	articlestore "main/articleStore"
 	"main/models"
 	"net/http"
 )
@@ -18,7 +19,9 @@ func main() {
 		{Id: "2", Title: "Hello2", Desc: "Article Description for Hello2", Content: "Article Content for Hello2"},
 	}
 
-	server := api.NewServer(&Articles)
+	articles := articlestore.NewStore(Articles)
+
+	server := api.NewServer(articles)
 	log.Fatal(http.ListenAndServe("localhost:10000", server))
 
 	// go to http://localhost:10000/
