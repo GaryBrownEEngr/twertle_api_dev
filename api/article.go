@@ -3,49 +3,49 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"main/models"
 	"net/http"
 
 	"github.com/gorilla/mux"
 )
 
+func encodeJSON(w http.ResponseWriter, thing interface{}, status int) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(thing)
+}
+
 func returnAllArticles(articles models.ArticleStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-
 		fmt.Println("Endpoint Hit: returnAllArticles")
-		json.NewEncoder(w).Encode(articles.GetArticles())
+		encodeJSON(w, articles.GetArticles(), http.StatusOK)
 	}
 }
 
 func returnSingleArticles(articles models.ArticleStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
 
 		vars := mux.Vars(r)
 		key := vars["id"]
 
 		a := articles.GetArticle(key)
 		if a == nil {
-			json.NewEncoder(w).Encode(apiError{"article not found"})
+			encodeJSON(w, apiError{"article not found"}, http.StatusBadRequest)
 			return
 		}
 
-		json.NewEncoder(w).Encode(a)
+		encodeJSON(w, a, http.StatusOK)
 	}
 }
 
 func createNewArticle(articles models.ArticleStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-
-		reqBody, _ := ioutil.ReadAll(r.Body)
-		fmt.Fprintf(w, "%+v", string(reqBody))
-
 		var newArticle models.Article
-		json.Unmarshal(reqBody, &newArticle)
+		if err := json.NewDecoder(r.Body).Decode(&newArticle); err != nil {
+			encodeJSON(w, apiError{"unable to parse JSON"}, http.StatusBadRequest)
+			return
+		}
 		articles.CreateArticle(&newArticle)
-		json.NewEncoder(w).Encode(newArticle)
+		encodeJSON(w, newArticle, http.StatusCreated)
 	}
 }
