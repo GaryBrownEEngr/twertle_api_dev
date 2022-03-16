@@ -1,17 +1,17 @@
+# syntax=docker/dockerfile:1
+FROM golang:1.18.0 AS builder
+RUN mkdir /build
+ADD . /build
+WORKDIR /build
+RUN go mod tidy
+RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main .
+
+
 FROM alpine
 
 RUN mkdir /app
-WORKDIR /app
-COPY main .
+
+COPY --from=builder /build/main /app
 ADD static static
 CMD ["/app/main"]
 
-
-
-
-# FROM golang:alpine
-# RUN mkdir /app
-# ADD . /app
-# WORKDIR /app
-# RUN go build -o main .
-# CMD ["/app/main"]
