@@ -22,7 +22,8 @@ func main() {
 	articles := articlestore.NewStore(Articles)
 
 	server := api.NewServer(articles)
-	log.Fatal(http.ListenAndServe("localhost:10000", server))
+	log.Fatal(http.ListenAndServe(":10000", server))
+	//log.Fatal(http.ListenAndServe("localhost:10000", server))
 
 	// go to http://localhost:10000/
 	// go to http://localhost:10000/post.html
