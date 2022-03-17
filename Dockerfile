@@ -13,5 +13,6 @@ RUN mkdir /app
 
 COPY --from=builder /build/main /app
 ADD static static
+ADD frontend/build static/ticktacktoe
 CMD ["/app/main"]
 

@@ -30,4 +30,5 @@ func main() {
 	// go to http://localhost:10000/guess.html
 	// go to http://localhost:10000/test2.html
 	// go to http://localhost:10000/api/articles
+	// go to http://localhost:10000/ticktacktoe
 }

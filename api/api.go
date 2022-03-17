@@ -53,10 +53,9 @@ func (m *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	endTime := time.Now()
 	elapsed := endTime.Sub(startTime)
 	log.Printf(
-		"duration=%dns status=%d body=%s path=%s",
+		"duration=%dns status=%d path=%s",
 		elapsed,
 		logRespWriter.statusCode,
-		logRespWriter.buf.String(),
 		r.URL.Path)
 }
 
