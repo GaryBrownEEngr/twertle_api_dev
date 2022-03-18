@@ -45,62 +45,49 @@ function Board(props) {
   return <div>{out}</div>;
 }
 
-function Example() {
-  // Declare a new state variable, which we'll call "count"
-  const [count, setCount] = useState(0);
-
-  return (
-    <div>
-      <p>You clicked {count} times</p>
-      <button onClick={() => setCount(count + 1)}>Click me</button>
-    </div>
-  );
-}
-
 function Game() {
-  const [GameState, setGameState] = useState({
-    history: [
-      {
-        squares: Array(9).fill(null),
-        selectedCellNumber: null,
-      },
-    ],
-    stepNumber: 0,
-    xIsNext: true,
-    sortReversed: false,
-  });
+  const [history, setHistory] = useState([
+    {
+      squares: Array(9).fill(null),
+      selectedCellNumber: null,
+    },
+  ]);
+
+  const [stepNumber, setStepNumber] = useState(0);
+  const [xIsNext, setXIsNext] = useState(true);
+  const [sortReversed, setSortReversed] = useState(false);
 
   function handleClick(i) {
-    const history = GameState.history.slice(0, GameState.stepNumber + 1);
-    const current = history[history.length - 1];
+    const historyNew = history.slice(0, stepNumber + 1);
+    const current = historyNew[historyNew.length - 1];
     const squares = current.squares.slice();
     if (calculateWinner(squares) || squares[i]) {
       return;
     }
-    squares[i] = GameState.xIsNext ? "X" : "O";
+    squares[i] = xIsNext ? "X" : "O";
 
-    setGameState({
-      history: history.concat([
+    setHistory(
+      historyNew.concat([
         {
           squares: squares,
           selectedCellNumber: i,
         },
-      ]),
-      stepNumber: history.length,
-      xIsNext: !GameState.xIsNext,
-      sortReversed: GameState.sortReversed,
-    });
+      ])
+    );
+
+    setStepNumber(historyNew.length);
+    setXIsNext(!xIsNext);
   }
 
   function jumpTo(step) {
-    setGameState({ ...GameState, stepNumber: step, xIsNext: step % 2 === 0 });
+    setStepNumber(step);
+    setXIsNext(step % 2 === 0);
   }
 
-  const history = GameState.history;
-  const current = history[GameState.stepNumber];
+  const current = history[stepNumber];
   const winner = calculateWinner(current.squares);
   const partsOfWin = returnWinLine(current.squares);
-  const isDraw = !winner && GameState.stepNumber === 9;
+  const isDraw = !winner && stepNumber === 9;
 
   const moves = history.map((step, move) => {
     const desc = move
@@ -115,16 +102,16 @@ function Game() {
       <li key={move}>
         <button
           style={{
-            fontWeight: move === GameState.stepNumber ? "bold" : "normal",
+            fontWeight: move === stepNumber ? "bold" : "normal",
           }}
-          onClick={() => jumpTo(move, GameState, setGameState)}
+          onClick={() => jumpTo(move)}
         >
           {desc}
         </button>
       </li>
     );
   });
-  if (GameState.sortReversed) {
+  if (sortReversed) {
     moves.reverse();
   }
 
@@ -134,7 +121,7 @@ function Game() {
   } else if (isDraw) {
     status = "Draw";
   } else {
-    status = "Next player: " + (GameState.xIsNext ? "X" : "O");
+    status = "Next player: " + (xIsNext ? "X" : "O");
   }
   return (
     <div className="game">
@@ -142,7 +129,7 @@ function Game() {
         <Board
           squares={current.squares}
           partsOfWin={partsOfWin}
-          onClick={(i) => handleClick(i, GameState, setGameState)}
+          onClick={(i) => handleClick(i)}
         />
       </div>
       <div className="game-info">
@@ -152,20 +139,14 @@ function Game() {
             reverse sort
             <input
               type="checkbox"
-              checked={GameState.sortReversed}
-              onChange={() =>
-                setGameState({
-                  ...GameState,
-                  sortReversed: !GameState.sortReversed,
-                })
-              }
+              checked={sortReversed}
+              onChange={() => setSortReversed(!sortReversed)}
             ></input>
           </label>
         </div>
 
         <ol>{moves}</ol>
       </div>
-      <Example></Example>
     </div>
   );
 }
