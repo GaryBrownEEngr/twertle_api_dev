@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"main/models"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -22,11 +23,15 @@ func returnAllArticles(articles models.ArticleStore) http.HandlerFunc {
 	}
 }
 
-func returnSingleArticles(articles models.ArticleStore) http.HandlerFunc {
+func returnSingleArticle(articles models.ArticleStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		vars := mux.Vars(r)
-		key := vars["id"]
+		key, err := strconv.Atoi(vars["id"])
+		if err != nil {
+			encodeJSON(w, apiError{"Id param is invalid"}, http.StatusBadRequest)
+			return
+		}
 
 		a := articles.GetArticle(key)
 		if a == nil {
@@ -35,6 +40,22 @@ func returnSingleArticles(articles models.ArticleStore) http.HandlerFunc {
 		}
 
 		encodeJSON(w, a, http.StatusOK)
+	}
+}
+
+func deleteSingleArticle(articles models.ArticleStore) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		vars := mux.Vars(r)
+		key, err := strconv.Atoi(vars["id"])
+		if err != nil {
+			encodeJSON(w, apiError{"Id param is invalid"}, http.StatusBadRequest)
+			return
+		}
+
+		articles.DeleteArticle(key)
+
+		encodeJSON(w, nil, http.StatusOK)
 	}
 }
 

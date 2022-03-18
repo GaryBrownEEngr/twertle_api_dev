@@ -42,10 +42,11 @@ func (m *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	//	... operation that takes 20 milliseconds ...
 	//	t := time.Now()
 	//	elapsed := t.Sub(start)
+	logRespWriter.Header().Set("Access-Control-Allow-Origin", "*")
+	logRespWriter.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	logRespWriter.Header().Set("Access-Control-Allow-Methods", "*")
 
 	if r.Method == "OPTIONS" {
-		logRespWriter.Header().Set("Access-Control-Allow-Origin", "*")
-		logRespWriter.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 		return
 	}
 	m.mux.ServeHTTP(logRespWriter, r)
@@ -64,7 +65,8 @@ func NewServer(articles models.ArticleStore) *Server {
 
 	myRouter.HandleFunc("/api/articles", returnAllArticles(articles))
 	myRouter.HandleFunc("/api/article", createNewArticle(articles)).Methods("POST")
-	myRouter.HandleFunc("/api/article/{id}", returnSingleArticles(articles))
+	myRouter.HandleFunc("/api/article/{id}", returnSingleArticle(articles)).Methods("GET")
+	myRouter.HandleFunc("/api/article/{id}", deleteSingleArticle(articles)).Methods("DELETE")
 	myRouter.HandleFunc("/api/checkguess", checkGuess)
 
 	fileServer := http.FileServer(http.Dir("./static"))

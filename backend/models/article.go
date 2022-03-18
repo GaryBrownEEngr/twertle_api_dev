@@ -1,7 +1,7 @@
 package models
 
 type Article struct {
-	Id      string `json:"Id"`
+	Id      int    `json:"Id"`
 	Title   string `json:"Title"`
 	Desc    string `json:"desc"`
 	Content string `json:"content"`
@@ -9,6 +9,7 @@ type Article struct {
 
 type ArticleStore interface {
 	CreateArticle(newArticle *Article)
-	GetArticle(id string) *Article
+	GetArticle(id int) *Article
 	GetArticles() []Article
+	DeleteArticle(id int)
 }

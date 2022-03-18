@@ -15,8 +15,8 @@ import (
 func main() {
 	fmt.Println("Rest API v2.0 - Mux Routers")
 	Articles := []models.Article{
-		{Id: "1", Title: "Hello", Desc: "Article Description for Hello", Content: "Article Content for Hello"},
-		{Id: "2", Title: "Hello2", Desc: "Article Description for Hello2", Content: "Article Content for Hello2"},
+		{Id: 1, Title: "Hello", Desc: "Article Description for Hello", Content: "Article Content for Hello"},
+		{Id: 2, Title: "Hello2", Desc: "Article Description for Hello2", Content: "Article Content for Hello2"},
 	}
 
 	articles := articlestore.NewStore(Articles)
