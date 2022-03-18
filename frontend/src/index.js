@@ -57,32 +57,6 @@ function Example() {
   );
 }
 
-function gameTwohandleClick(i, GameState, setGameState) {
-  const history = GameState.history.slice(0, GameState.stepNumber + 1);
-  const current = history[history.length - 1];
-  const squares = current.squares.slice();
-  if (calculateWinner(squares) || squares[i]) {
-    return;
-  }
-  squares[i] = GameState.xIsNext ? "X" : "O";
-
-  setGameState({
-    history: history.concat([
-      {
-        squares: squares,
-        selectedCellNumber: i,
-      },
-    ]),
-    stepNumber: history.length,
-    xIsNext: !GameState.xIsNext,
-    sortReversed: GameState.sortReversed,
-  });
-}
-
-function jumpTo(step, GameState, setGameState) {
-  setGameState({ ...GameState, stepNumber: step, xIsNext: step % 2 === 0 });
-}
-
 function Game() {
   const [GameState, setGameState] = useState({
     history: [
@@ -95,6 +69,32 @@ function Game() {
     xIsNext: true,
     sortReversed: false,
   });
+
+  function handleClick(i) {
+    const history = GameState.history.slice(0, GameState.stepNumber + 1);
+    const current = history[history.length - 1];
+    const squares = current.squares.slice();
+    if (calculateWinner(squares) || squares[i]) {
+      return;
+    }
+    squares[i] = GameState.xIsNext ? "X" : "O";
+
+    setGameState({
+      history: history.concat([
+        {
+          squares: squares,
+          selectedCellNumber: i,
+        },
+      ]),
+      stepNumber: history.length,
+      xIsNext: !GameState.xIsNext,
+      sortReversed: GameState.sortReversed,
+    });
+  }
+
+  function jumpTo(step) {
+    setGameState({ ...GameState, stepNumber: step, xIsNext: step % 2 === 0 });
+  }
 
   const history = GameState.history;
   const current = history[GameState.stepNumber];
@@ -142,7 +142,7 @@ function Game() {
         <Board
           squares={current.squares}
           partsOfWin={partsOfWin}
-          onClick={(i) => gameTwohandleClick(i, GameState, setGameState)}
+          onClick={(i) => handleClick(i, GameState, setGameState)}
         />
       </div>
       <div className="game-info">
